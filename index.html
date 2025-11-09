@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thư Tỏ Tình — Trái Tim</title>
+  <style>
+    :root{
+      --grad1:#ff7aa2;
+      --grad2:#ff375f;
+      --paper: rgba(255,255,255,0.94);
+      --text:#4a1630;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;}
+    body{
+      display:flex;align-items:center;justify-content:center;
+      background: radial-gradient(circle at 50% 30%, #fff6fb 0%, #ffeef6 40%, #ffdbe8 100%);
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      overflow:hidden;
+    }
+    .stage{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;}
+    .heart-svg{
+      position:absolute;width:min(92vmin,960px);height:min(92vmin,960px);
+      filter: drop-shadow(0 18px 45px rgba(255,60,120,0.28));
+      z-index:1;
+      animation: heartbeat 2800ms ease-in-out infinite;
+    }
+    @keyframes heartbeat{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+
+    .note{
+      position:relative;z-index:6;
+      width:clamp(250px,58vw,520px);
+      max-height:78vh;overflow:auto;
+      padding:18px;
+      border-radius:14px;
+      background:var(--paper);
+      box-shadow:0 10px 28px rgba(160,50,100,0.08);
+      border:1px solid rgba(255,150,175,0.18);
+      color:var(--text);
+      font-size:clamp(14px,2.4vw,18px);
+      line-height:1.6;
+      white-space:pre-line;
+    }
+    .note p{margin:8px 0;}
+    .note .sign{text-align:right;margin-top:10px;font-weight:600;color:#8b2b4d;}
+
+    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,245,249,0.96);z-index:20}
+    .lock-box{background:white;border-radius:14px;padding:18px;max-width:360px;width:86%;text-align:center;box-shadow:0 12px 36px rgba(199,80,120,0.14);}
+    .lock-row{display:flex;gap:8px;justify-content:center;margin-top:12px}
+    input[type=password]{padding:10px;border-radius:10px;border:1px solid rgba(255,160,185,0.26);width:62%}
+    button.unlock{background:linear-gradient(180deg,var(--grad1),var(--grad2));color:#fff;border:none;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+
+    #loveBtn{
+      position:absolute;
+      bottom:14vh;
+      z-index:10;
+      padding:10px 20px;
+      background:linear-gradient(90deg,var(--grad1),var(--grad2));
+      border:none;border-radius:40px;
+      color:white;font-size:18px;font-weight:700;
+      cursor:pointer;
+      opacity:0;
+      transform:scale(0.8);
+      transition:all .8s ease;
+      box-shadow:0 0 15px rgba(255,90,140,0.4);
+    }
+    #loveBtn.show{opacity:1;transform:scale(1);}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <svg class="heart-svg" viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="hg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#ff89a8" />
+          <stop offset="60%" stop-color="#ff3b6b" />
+          <stop offset="100%" stop-color="#ff1e63" />
+        </linearGradient>
+      </defs>
+      <path d="M100 176 C28 118 8 88 32 56 C52 30 84 34 100 56 C116 34 148 30 168 56 C192 88 172 118 100 176 Z"
+        fill="url(#hg)" stroke="#ff99b0" stroke-width="1.4"/>
+    </svg>
+
+    <div class="note" id="note" style="display:none;"></div>
+
+    <div class="overlay" id="overlay">
+      <div class="lock-box">
+        <h2>Thư hiện tại đã được khoá 🔒</h2>
+        <div style="margin-top:6px;color:#8b2b4d">Nhập mật khẩu để mở trái tim nhé 💗</div>
+        <div class="lock-row">
+          <input id="pwdInput" type="password" placeholder="dd/mm/yyyy" />
+          <button class="unlock" id="unlockBtn">Mở khoá</button>
+        </div>
+        <div style="margin-top:8px;color:#b04b72;font-size:13px">Gợi ý: một ngày đặc biệt 💕</div>
+      </div>
+    </div>
+
+    <button id="loveBtn">💖 Ấn vào đây 💖</button>
+  </div>
+
+  <script>
+    const noteText = `Em đến , đời anh bỗng tràn đầy nắng ấm!
+
+Tim anh lặng yên khi thấy nụ cười của em
+Mỗi khoảnh khắc bên em là kỉ niệm quý giá
+Chỉ cần em cười, mệt mỏi đến đâu đều tan biến...
+
+Anh muốn mỗi ngày được bên em mãi mãi
+Và được gọi em là người anh thương nhất.
+
+Thương em bằng cả tấm lòng
+Chân thành hứa hẹn cả cuộc đời
+Vì em là cả thế giới, tia nắng ấm áp bình yên của đời anh....
+
+— Trung Hậu 💌`;
+
+    const correct = '22/08/2008';
+    const overlay = document.getElementById('overlay');
+    const input = document.getElementById('pwdInput');
+    const btn = document.getElementById('unlockBtn');
+    const note = document.getElementById('note');
+    const loveBtn = document.getElementById('loveBtn');
+    const linkTarget = "https://panbap.github.io/Myheart/index.html?id=eyJtZXNzYWdlcyI6WyJBbmggVGjGsCJdLCJpbWFnZXMiOlsiaHR0cHM6Ly9pLmliYi5jby9ScHF4SFdHWS8xMDAwMDE3NDM5LmpwZyIsImh0dHBzOi8vaS5pYmIuY28vWjF2Sm1xUVovMTAwMDAxNzQzOC5qcGciXSwiaGVhcnRDb2xvciI6IiNmZjkwOTAiLCJtdXNpYyI6ImEubXAzIn0=";
+
+    btn.addEventListener('click', unlock);
+    input.addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+    loveBtn.addEventListener('click', ()=> window.location.href = linkTarget);
+
+    function unlock(){
+      if(input.value.trim()===correct){
+        overlay.style.transition='opacity 0.6s ease';
+        overlay.style.opacity=0;
+        setTimeout(()=>overlay.remove(),650);
+        typeWriter(noteText, note);
+      }else{
+        btn.textContent='Sai mật khẩu 😢';
+        setTimeout(()=>btn.textContent='Mở khoá',900);
+      }
+    }
+
+    // Gõ chữ từ từ
+    function typeWriter(text, element){
+      element.style.display='block';
+      let i=0;
+      function typing(){
+        if(i<text.length){
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(typing,35);
+        }else{
+          loveBtn.classList.add('show');
+        }
+      }
+      typing();
+    }
+  </script>
+</body>
+</html>
+
